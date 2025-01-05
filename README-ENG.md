@@ -1,95 +1,26 @@
-# Secret Sing-Box (SSB)
+# Secret-Sing-Box + Pi-hole
 
-[**Russian version**](https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/README.md)
+### Adds Pi-hole for flexible configuration of ad blocking and other unwanted domains when using [Sing-box](https://github.com/SagerNet/sing-box)
 
-### Trojan and VLESS proxy with TLS termination on NGINX or HAProxy
-This script is designed to fully and easily configure a secure proxy server with [Sing-Box](https://sing-box.sagernet.org) core and [NGINX](https://nginx.org/en/) or [HAProxy](https://www.haproxy.org) camouflage. Two setup methods:
+Based on https://github.com/MeMadao/Secret-Sing-Box_PiHole
 
-- All requests to the proxy are received by NGINX, the requests are passed to Sing-Box only if they contain the correct path (WebSocket or HTTPUpgrade transport)
+Differences:
+* .by domains are excluded from proxying
+* Added [Pi-hole](https://github.com/pi-hole/pi-hole) (works via Nginx)
+* Pi-hole acts as a DNS server for [Sing-box](https://github.com/SagerNet/sing-box):  `"dns": { "servers": [ { "tag": "dns-remote", "address": "127.0.0.1" } ] }`
 
-![nginx-en](https://github.com/user-attachments/assets/712075b6-1c93-482f-9297-0f20cc06fc2f)
+> Currently, Pi-hole does not differentiate between different Sing-box clients and perceives them as one.
 
-- All requests to the proxy are received by HAProxy, then Trojan passwords are read from the first 56 bytes of the request by using a Lua script, the requests are passed to Sing-Box only if they contain the correct Trojan password (TCP transport) — [FPPweb3](https://github.com/FPPweb3) method
-
-![haproxy-en](https://github.com/user-attachments/assets/b3eb970d-7856-4bdd-83ad-112b5019e7b5)
-
-Both setup methods make it impossible to detect Sing-Box from the outside, which improves security.
-
-> [!IMPORTANT]
-> Recommended OS: Debian 11/12 or Ubuntu 22.04/24.04. You will also need an IPv4 on the server and your own domain linked to your Cloudflare account ([How to set it up?](https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/cf-settings-en.md)). Run as root on a newly installed system. It's recommended to update and reboot the system before running this script.
->
-> This project is created for educational and demonstration purposes. Please make sure that your actions are legal before using it.
-
-> [!NOTE]
-> With routing rules for Russia. Open ports on the server: 443 and SSH.
- 
-### Includes:
-1) Sing-Box server setup
-2) NGINX or HAProxy reverse proxy and website setup on port 443
-3) Multiplexing to optimise connections
-4) Security setup (optional)
-5) Cloudflare TLS certificates with auto renewal
-6) WARP setup
-7) Enable BBR
-8) Client Sing-Box configs with routing rules for Russia
-9) Automated management of user config files
-10) Optional setup of proxy chains of two or more servers
- 
-### Server setup:
-
-To setup the server, run this command on it:
+## Installation
 
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/install-server.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/refs/heads/main/Scripts/install-server.sh)
 ```
 
-Then just enter the necessary information:
+For proper functioning, during the installation of Pi-hole, it is necessary to enable the UI:
 
-![pic-1-en](https://github.com/user-attachments/assets/fbebc90c-d445-4dfe-afd0-063e8f0e1c68)
+![image](https://github.com/user-attachments/assets/0b1cbbcc-0b0f-4c56-919e-8d285f4d7691)
 
-The script will show your client links in the end, it's recommended to save them.
+As well as PHP for the UI to work correctly:
 
------
-
-To display additional settings, run this command:
-
-```
-sbmanager
-```
-
-Then follow the instructions:
-
-![pic-2-en](https://github.com/user-attachments/assets/47334fd3-b451-48dc-bb2b-9075d1d8fb4c)
-
-Options 5 and 6 synchronize the settings in client configs of all users, which eliminates the need to edit the config of each user separately.
-
-### WARP+ keys:
-
-To activate a WARP+ key, enter this command (replace the key with yours):
-
-```
-warp-cli registration license CMD5m479-Y5hS6y79-U06c5mq9
-```
-
-### Client setup:
-> [!IMPORTANT]
-> On some devices, "stack": "system" in tun interface settings in client configs might not work. In such cases, it is recommended to replace it with "gvisor" by using option 4 in sbmanager.
-
-[Android and iOS](https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/Client-Guidelines/Sing-Box-Android-iOS-en.md). The guide is given for Android, the app interface is different on iOS, but it has similar settings.
-
-[Windows](https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/Client-Guidelines/Sing-Box-Windows-en.md). This method is recommended due to more complete routing settings, but you can also import the link to [Hiddify](https://github.com/hiddify/hiddify-app/releases/latest) client app.
-
-[Linux](https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/README-ENG.md#client-setup). Run the command below and follow the instructions or use [Hiddify](https://github.com/hiddify/hiddify-app/releases/latest) client app.
-```
-bash <(curl -Ls https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/sb-pc-linux-en.sh)
-```
-
-### You can support the project if it's helpful to you:
-- USDT (BEP20): 0xe2FeA540a9F1f85C2bfA3e6949c722393B5d636A
-- USDT (TRC20): TFN44R1PnhyX29vBqv9Z4cB5wH7MrVyFoC
-- Bitcoin (BIP84): bc1qhn2ghk3pcpsrr6l9ywfryvqfzvyx8gs2wnpz89
-- Litecoin (BIP84): ltc1q7quvcq3gtlwf2yuk370vhf2syad8ee4we9huj4
-- Toncoin (TON): UQCWmIBsU-EZJSH3rhghbtSOtKQBmb5y74mkjbohpDWZ6l-H
-
-### Stargazers over time:
-[![Stargazers over time](https://starchart.cc/BLUEBL0B/Secret-Sing-Box.svg?variant=adaptive)](https://starchart.cc/BLUEBL0B/Secret-Sing-Box)
+![image](https://github.com/user-attachments/assets/1aaada14-5532-472c-88eb-c601f77e1f16)

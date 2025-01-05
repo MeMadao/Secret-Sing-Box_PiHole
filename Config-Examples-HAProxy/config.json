@@ -8,7 +8,7 @@
     "servers": [
       {
         "tag": "dns-remote",
-        "address": "tls://1.1.1.1"
+        "address": "127.0.0.1"
       },
       {
         "tag": "dns-block",
@@ -16,13 +16,6 @@
       }
     ],
     "rules": [
-      {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "server": "dns-block",
-        "disable_cache": true
-      },
       {
         "outbound": "any",
         "server": "dns-remote"
@@ -81,12 +74,6 @@
         "outbound": "dns-out"
       },
       {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "outbound": "block"
-      },
-      {
         "protocol": "quic",
         "outbound": "block"
       },
@@ -100,6 +87,7 @@
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "rutracker.org",
@@ -165,12 +153,6 @@
         "type": "remote",
         "format": "binary",
         "url": "https://github.com/SagerNet/sing-geosite/raw/rule-set/geosite-telegram.srs"
-      },
-      {
-        "tag": "category-ads-all",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://github.com/SagerNet/sing-geosite/raw/rule-set/geosite-category-ads-all.srs"
       }
     ]
   },
