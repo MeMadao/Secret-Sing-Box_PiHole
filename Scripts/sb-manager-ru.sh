@@ -34,14 +34,14 @@ replace_template() {
 templates() {
     if [ ! -f /etc/haproxy/auth.lua ] && [[ $(jq -r '.inbounds[] | select(.tag=="trojan-in") | .transport.type' /etc/sing-box/config.json) == "ws" ]]
     then
-        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-WS.json
+        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-WS.json
         replace_template
     elif [ ! -f /etc/haproxy/auth.lua ] && [[ $(jq -r '.inbounds[] | select(.tag=="trojan-in") | .transport.type' /etc/sing-box/config.json) == "httpupgrade" ]]
     then
-        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-HTTPUpgrade.json
+        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-HTTPUpgrade.json
         replace_template
     else
-        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-HAProxy.json
+        wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-HAProxy.json
         replace_template
     fi
 
@@ -694,7 +694,7 @@ check_nextlink() {
 }
 
 chain_end() {
-    config_temp=$(curl -s https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/config.json)
+    config_temp=$(curl -s https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/config.json)
 
     if [ $(jq -e . >/dev/null 2>&1 <<< "${config_temp}"; echo $?) -eq 0 ] && [ -n "${config_temp}" ]
     then
