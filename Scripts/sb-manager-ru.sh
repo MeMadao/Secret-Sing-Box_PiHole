@@ -42,7 +42,7 @@ templates() {
         template_file="Client-Trojan-HAProxy.json"
     fi
 
-    wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/${template_file}
+    wget -q -O /var/www/${subspath}/template.json.1 https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/${template_file}
     replace_template
 
     if [ ! -f /var/www/${subspath}/template-loc.json ]
@@ -696,7 +696,7 @@ cf_ip_settings() {
     echo -e "${red}ВНИМАНИЕ!${clear}"
     echo "Этот пункт рекомендуется в случае недоступности IP, который Cloudflare выделил вашему домену для проксирования"
     echo "Нужно просканировать диапазоны IP Cloudflare с вашего устройства и самостоятельно выбрать оптимальный IP"
-    echo "Инструкция: https://github.com/BLUEBL0B/Secret-Sing-Box/blob/main/Docs/cf-scan-ip-ru.md"
+    echo "Инструкция: https://github.com/MeMadao/Secret-Sing-Box_PiHole/blob/main/Docs/cf-scan-ip-ru.md"
     echo ""
 
     while [[ $username != "x" ]] && [[ $username != "х" ]]
@@ -864,7 +864,7 @@ check_nextlink() {
 }
 
 chain_end() {
-    config_temp=$(curl -s https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/config.json)
+    config_temp=$(curl -s https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/config.json)
 
     if [ $(jq -e . >/dev/null 2>&1 <<< "${config_temp}"; echo $?) -eq 0 ] && [ -n "${config_temp}" ]
     then
@@ -1366,9 +1366,9 @@ update_ssb() {
     export -f edit_configs_sync
     export -f sync_client_configs_github
 
-    if [ $(wget -q -O /dev/null https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/update-server.sh; echo $?) -eq 0 ]
+    if [ $(wget -q -O /dev/null https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/update-server.sh; echo $?) -eq 0 ]
     then
-        bash <(curl -Ls https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/update-server.sh)
+        bash <(curl -Ls https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/update-server.sh)
         exit 0
     else
         echo -e "${red}Ошибка: не удалось загрузить данные с GitHub${clear}"
