@@ -769,7 +769,7 @@ nginx_options() {
 }
 
 enter_ssh_data_ru() {
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" == "2" ]]
     then
         echo -e "${textcolor}[?]${clear} Введите новый номер порта SSH или 22 (рекомендуется номер более 1024):"
         read sshp
@@ -787,7 +787,7 @@ enter_ssh_data_ru() {
 }
 
 enter_ssh_data_en() {
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" == "2" ]]
     then
         echo -e "${textcolor}[?]${clear} Enter new SSH port number or 22 (number above 1024 is recommended):"
         read sshp
@@ -802,6 +802,43 @@ enter_ssh_data_en() {
         echo ""
         check_password_en
     fi
+}
+
+pihole_path() {
+    while true; do
+        if [[ "${language}" == "1" ]]; then
+            echo -e "${textcolor}[?]${clear} Введите путь к административной панели Pi-hole (например: my-admin, не используйте admin). Если ничего не введено, будет использован стандартный путь: pihole-admin."
+        else
+            echo -e "${textcolor}[?]${clear} Enter the path to the Pi-hole admin panel (e.g., my-admin, do not use admin). If left blank, the default path 'pihole-admin' will be used."
+        fi
+
+        read -p "> " pihole_admin_path
+
+        if [[ -z "${pihole_admin_path}" ]]; then
+            pihole_admin_path="pihole-admin"
+            if [[ "${language}" == "1" ]]; then
+                echo -e "${textcolor}[✔]${clear} Использован стандартный путь: ${pihole_admin_path}"
+            else
+                echo -e "${textcolor}[✔]${clear} Default path used: ${pihole_admin_path}"
+            fi
+            break
+        fi
+
+        if [[ "${pihole_admin_path}" =~ ^[a-zA-Z0-9_\-\/]*$ ]] && [[ ! "${pihole_admin_path}" =~ ^/ ]]; then
+            if [[ "${language}" == "1" ]]; then
+                echo -e "${textcolor}[✔]${clear} Путь к административной панели установлен: ${pihole_admin_path}"
+            else
+                echo -e "${textcolor}[✔]${clear} Admin panel path set to: ${pihole_admin_path}"
+            fi
+            break
+        else
+            if [[ "${language}" == "1" ]]; then
+                echo -e "${red}[✘] Ошибка: Путь не должен начинаться с '/', содержать пробелы или быть равным 'admin'.${clear}"
+            else
+                echo -e "${red}[✘] Error: The path must not start with '/', contain spaces, or be 'admin'.${clear}"
+            fi
+        fi
+    done
 }
 
 enter_data_ru() {
@@ -877,9 +914,11 @@ enter_data_ru() {
     [[ ! -z $rulesetpath ]] && echo ""
     crop_rulesetpath
     check_rulesetpath_ru
+    pihole_path
     echo -e "${textcolor}[?]${clear} Нужна ли настройка безопасности (SSH, UFW и unattended-upgrades)?"
-    echo "1 - Да (в случае нестандартных настроек у хостера или ошибки при вводе данных можно потерять доступ к серверу)"
-    echo "2 - Нет"
+    echo "1 - Да, базовая: UFW и unattended-upgrades"
+    echo "2 - Да, полная: UFW, unattended-upgrades, SSH (в случае нестандартных настроек у хостера или ошибки при вводе данных можно потерять доступ к серверу)"
+    echo "3 - Нет"
     read sshufw
     echo ""
     enter_ssh_data_ru
@@ -959,8 +998,9 @@ enter_data_en() {
     crop_rulesetpath
     check_rulesetpath_en
     echo -e "${textcolor}[?]${clear} Do you need security setup (SSH, UFW and unattended-upgrades)?"
-    echo "1 - Yes (in case of hoster's non-standard settings or a mistake while entering data, access to the server might be lost)"
-    echo "2 - No"
+    echo "1 - Yes, basic: UFW and unattended-upgrades"
+    echo "2 - Yes, full: UFW, unattended-upgrades, SSH (in case of hoster's non-standard settings or a mistake while entering data, access to the server might be lost)"
+    echo "3 - No"
     read sshufw
     echo ""
     enter_ssh_data_en
@@ -1004,7 +1044,7 @@ install_packages() {
         apt install ubuntu-keyring -y
     fi
 
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" != "3" ]]
     then
         apt install ufw unattended-upgrades -y
     fi
@@ -1106,8 +1146,20 @@ setup_ssh() {
 
 setup_ufw() {
     echo -e "${textcolor_light}Setting up UFW...${clear}"
-    ufw allow ${sshp}/tcp
+     
+    if [[ "${sshufw}" == "2" ]]
+    then
+      ufw allow ${sshp}/tcp
+    else      
+      ufw allow 22/tcp      
+    fi
+    
     ufw allow 443/tcp
+    ufw deny in 53/tcp
+    ufw deny in 53/udp
+    ufw deny in 853/tcp
+    ufw deny in 853/udp
+
     # Protection from Reality certificate stealing:
     ufw insert 1 deny from ${serverip}/22 &> /dev/null
     echo ""
@@ -1127,12 +1179,16 @@ unattended_upgrades() {
 }
 
 setup_security() {
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" != "3" ]]
+    then
+        setup_ufw
+        unattended_upgrades
+    fi
+  
+    if [[ "${sshufw}" == "2" ]]
     then
         create_user
         setup_ssh
-        setup_ufw
-        unattended_upgrades
     fi
 }
 
@@ -1253,7 +1309,7 @@ download_rule_sets() {
 
     chmod -R 755 /var/www/${rulesetpath}
 
-    wget -O /usr/local/bin/rsupdate https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/ruleset-update.sh
+    wget -O /usr/local/bin/rsupdate https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/ruleset-update.sh
     chmod +x /usr/local/bin/rsupdate
     { crontab -l; echo "10 2 * * * /usr/local/bin/rsupdate"; } | crontab -
 }
@@ -1273,7 +1329,7 @@ cat > /etc/sing-box/config.json <<EOF
     "servers": [
       {
         "tag": "dns-remote",
-        "address": "tls://1.1.1.1"
+        "address": "127.0.0.1"
       },
       {
         "tag": "dns-block",
@@ -1281,13 +1337,6 @@ cat > /etc/sing-box/config.json <<EOF
       }
     ],
     "rules": [
-      {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "server": "dns-block",
-        "disable_cache": true
-      },
       {
         "outbound": "any",
         "server": "dns-remote"
@@ -1384,6 +1433,7 @@ cat > /etc/sing-box/config.json <<EOF
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "rutracker.org",
@@ -1449,12 +1499,6 @@ cat > /etc/sing-box/config.json <<EOF
         "type": "local",
         "format": "binary",
         "path": "/var/www/${rulesetpath}/geosite-telegram.srs"
-      },
-      {
-        "tag": "category-ads-all",
-        "type": "local",
-        "format": "binary",
-        "path": "/var/www/${rulesetpath}/geosite-category-ads-all.srs"
       }
     ]
   },
@@ -1500,7 +1544,7 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
     "servers": [
       {
         "tag": "dns-remote",
-        "address": "tls://1.1.1.1",
+        "address": "udp://9.9.9.9",
         "client_subnet": "${serverip}"
       },
       {
@@ -1515,13 +1559,6 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
     "rules": [
       {
         "rule_set": [
-          "category-ads-all"
-        ],
-        "server": "dns-block",
-        "disable_cache": true
-      },
-      {
-        "rule_set": [
           "telegram",
           "google"
         ],
@@ -1531,6 +1568,7 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "${domain}",
@@ -1689,6 +1727,7 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "${domain}",
@@ -2052,12 +2091,6 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
         "type": "remote",
         "format": "binary",
         "url": "https://${domain}/${rulesetpath}/geosite-aljazeera.srs"
-      },
-      {
-        "tag": "category-ads-all",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://${domain}/${rulesetpath}/geosite-category-ads-all.srs"
       }
     ],
     "auto_detect_interface": true,
@@ -2285,6 +2318,41 @@ http {
             alias /var/www/${rulesetpath}/;
             add_header Content-disposition "attachment";
         }
+        
+        # Pi-hole
+        location ^~ /pihole-admin {
+            alias /var/www/html/admin;
+            index index.php index.html index.htm;
+
+            location ~ ^/pihole-admin/.*\.php$ {
+                fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+                fastcgi_param SCRIPT_FILENAME \$request_filename;
+                include fastcgi_params;
+            }
+
+            location ~ /\. {
+                deny all;
+            }
+
+            add_header X-Frame-Options "DENY";
+            add_header X-XSS-Protection "0";
+            add_header X-Content-Type-Options "nosniff";
+            add_header Content-Security-Policy "default-src 'self' 'unsafe-inline';";
+            add_header X-Permitted-Cross-Domain-Policies "none";
+            add_header Referrer-Policy "same-origin";
+
+            location ~ ^/pihole-admin/(teleporter|api_token)\.php$ {
+                set \$http_referer_valid 0;
+
+                if (\$http_referer ~ /pihole-admin/settings\.php) {
+                    set \$http_referer_valid 1;
+                }
+
+                if (\$http_referer_valid = 1) {
+                    add_header X-Frame-Options "SAMEORIGIN";
+                }
+            }
+        }
 
         # Reverse proxy
         location = /${trojanpath} {
@@ -2427,6 +2495,41 @@ http {
         location /${rulesetpath}/ {
             alias /var/www/${rulesetpath}/;
             add_header Content-disposition "attachment";
+        }
+        
+        # Pi-hole
+        location ^~ /pihole-admin {
+            alias /var/www/html/admin;
+            index index.php index.html index.htm;
+
+            location ~ ^/pihole-admin/.*\.php$ {
+                fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+                fastcgi_param SCRIPT_FILENAME \$request_filename;
+                include fastcgi_params;
+            }
+
+            location ~ /\. {
+                deny all;
+            }
+
+            add_header X-Frame-Options "DENY";
+            add_header X-XSS-Protection "0";
+            add_header X-Content-Type-Options "nosniff";
+            add_header Content-Security-Policy "default-src 'self' 'unsafe-inline';";
+            add_header X-Permitted-Cross-Domain-Policies "none";
+            add_header Referrer-Policy "same-origin";
+
+            location ~ ^/pihole-admin/(teleporter|api_token)\.php$ {
+                set \$http_referer_valid 0;
+
+                if (\$http_referer ~ /pihole-admin/settings\.php) {
+                    set \$http_referer_valid 1;
+                }
+
+                if (\$http_referer_valid = 1) {
+                    add_header X-Frame-Options "SAMEORIGIN";
+                }
+            }
         }
 
         # gzip
@@ -2582,21 +2685,21 @@ add_sbmanager() {
 
     if [[ "${language}" == "1" ]]
     then
-        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/sb-manager-ru.sh
+        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/sb-manager-ru.sh
     else
-        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/sb-manager-en.sh
+        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/sb-manager-en.sh
     fi
 
     chmod +x /usr/local/bin/sbmanager
 
     if [[ "${variant}" == "1" ]] && [[ "${transport}" != "2" ]]
     then
-        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-WS.json
+        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-WS.json
     elif [[ "${variant}" == "1" ]] && [[ "${transport}" == "2" ]]
     then
-        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-HTTPUpgrade.json
+        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-HTTPUpgrade.json
     else
-        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/Client-Trojan-HAProxy.json
+        wget -O /var/www/${subspath}/template.json https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/Client-Trojan-HAProxy.json
     fi
 
     if [ -f /var/www/${subspath}/template.json ] && [ $(jq -e . < /var/www/${subspath}/template.json &>/dev/null; echo $?) -eq 0 ] && [ -s /var/www/${subspath}/template.json ]
@@ -2612,26 +2715,26 @@ add_sub_page() {
 
     if [[ "${variant}" == "1" ]] && [[ "${language}" == "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-ru.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-ru.html
     elif [[ "${variant}" == "1" ]] && [[ "${language}" != "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-en.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-en.html
     elif [[ "${variant}" != "1" ]] && [[ "${language}" == "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-ru-hapr.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-ru-hapr.html
     else
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-en-hapr.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-en-hapr.html
     fi
 
     sed -i -e "s/DOMAIN/$domain/g" -e "s/SUBSCRIPTION-PATH/$subspath/g" /var/www/${subspath}/sub.html
 
-    wget -O /var/www/${subspath}/background.jpg https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/background.jpg
+    wget -O /var/www/${subspath}/background.jpg https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/background.jpg
 }
 
 final_message_ru() {
     echo -e "${textcolor}Если выше не возникло ошибок, то настройка завершена!${clear}"
     echo ""
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" == "3" ]]
     then
         echo -e "${red}ВНИМАНИЕ!${clear}"
         echo "Для повышения безопасности сервера рекомендуется выполнить следующие действия:"
@@ -2679,12 +2782,16 @@ final_message_ru() {
         echo ""
         echo -e "${red}Ошибка: сертификат не выпущен, введите команду \"sbmanager\" и выберите пункт 10${clear}"
     fi
+
+    echo -e "${textcolor}[ℹ]${clear} Путь к административной панели Pi-hole: https://${domain}/${pihole_admin_path}"
+    echo -e "${textcolor}[ℹ]${clear} Для добавления пароля к административной панели Pi-hole выполните команду:"
+    echo -e "${textcolor}[ℹ]${clear} sudo pihole -a -p"
 }
 
 final_message_en() {
     echo -e "${textcolor}If there are no errors above then the setup is complete!${clear}"
     echo ""
-    if [[ "${sshufw}" != "2" ]]
+    if [[ "${sshufw}" == "3" ]]
     then
         echo -e "${red}ATTENTION!${clear}"
         echo "To increase the security of the server it's recommended to do the following:"
@@ -2732,6 +2839,32 @@ final_message_en() {
         echo ""
         echo -e "${red}Error: certificate has not been issued, enter \"sbmanager\" command and select option 10${clear}"
     fi
+
+    echo -e "${textcolor}[ℹ]${clear} Path to the Pi-hole admin panel: https://${domain}/${pihole_admin_path}"
+    echo -e "${textcolor}[ℹ]${clear} To set a password for the Pi-hole admin panel, use the following command:"
+    echo -e "${textcolor}[ℹ]${clear} sudo pihole -a -p"
+}
+
+install_pihole() {
+    echo -e "${textcolor_light}Installing Pi-hole...${clear}"
+
+    if command -v pihole &> /dev/null; then
+        echo -e "${textcolor_light}Pi-hole is already installed.${clear}"
+        return
+    fi
+
+    curl -sSL https://install.pi-hole.net | bash
+    
+    if systemctl status pihole-FTL.service &> /dev/null; then
+        echo -e "${textcolor_light}Pi-hole installation successful.${clear}"
+    else
+        echo -e "${red}Pi-hole installation failed. Please check logs for details.${clear}"
+        exit 1
+    fi
+        
+    sudo systemctl stop lighttpd
+    sudo systemctl disable lighttpd
+    sudo apt install php8.2-fpm
 }
 
 final_message() {
@@ -2760,6 +2893,7 @@ enable_bbr
 install_packages
 setup_security
 certificates
+install_pihole
 setup_warp
 setup_sing_box
 setup_nginx

@@ -7,7 +7,7 @@
     "servers": [
       {
         "tag": "dns-remote",
-        "address": "tls://1.1.1.1",
+        "address": "udp://9.9.9.9",
         "client_subnet": "SERVER-IP"
       },
       {
@@ -22,13 +22,6 @@
     "rules": [
       {
         "rule_set": [
-          "category-ads-all"
-        ],
-        "server": "dns-block",
-        "disable_cache": true
-      },
-      {
-        "rule_set": [
           "telegram",
           "google"
         ],
@@ -38,6 +31,7 @@
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "DOMAIN",
@@ -196,6 +190,7 @@
         "domain_suffix": [
           ".ru",
           ".su",
+          ".by",
           ".ru.com",
           ".ru.net",
           "DOMAIN",
@@ -559,12 +554,6 @@
         "type": "remote",
         "format": "binary",
         "url": "https://DOMAIN/RULESETPATH/geosite-aljazeera.srs"
-      },
-      {
-        "tag": "category-ads-all",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://DOMAIN/RULESETPATH/geosite-category-ads-all.srs"
       }
     ],
     "auto_detect_interface": true,
