@@ -12,7 +12,7 @@
       },
       {
         "tag": "dns-local",
-        "address": "tls://1.1.1.1"
+        "address": "udp://9.9.9.9"
       },
       {
         "tag": "dns-block",
