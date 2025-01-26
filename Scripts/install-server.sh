@@ -1480,7 +1480,7 @@ touch /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json
 cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
 {
   "log": {
-    "level": "info",
+    "level": "error",
     "timestamp": true
   },
   "dns": {
@@ -1492,7 +1492,7 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
       },
       {
         "tag": "dns-local",
-        "address": "tls://1.1.1.1"
+        "address": "udp://9.9.9.9"
       },
       {
         "tag": "dns-block",
