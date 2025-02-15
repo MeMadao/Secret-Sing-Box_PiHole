@@ -12,7 +12,7 @@
       },
       {
         "tag": "dns-local",
-        "address": "tls://1.1.1.1"
+        "address": "udp://9.9.9.9"
       },
       {
         "tag": "dns-block",
@@ -167,13 +167,6 @@
       {
         "ip_is_private": true,
         "outbound": "direct"
-      },
-      {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "action": "reject",
-        "method": "drop"
       },
       {
         "rule_set": [

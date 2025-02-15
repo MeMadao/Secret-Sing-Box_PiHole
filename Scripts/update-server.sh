@@ -138,7 +138,7 @@ update_services() {
 
     extract_values
     cp /etc/sing-box/config.json /etc/sing-box/config.json.0
-    wget -O /etc/sing-box/config.json.1 https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Config-Templates/config.json
+    wget -O /etc/sing-box/config.json.1 https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Config-Templates/config.json
 
     if [ $? -eq 0 ]
     then
@@ -208,20 +208,20 @@ update_sub_page() {
 
     if [ ! -f /etc/haproxy/auth.lua ] && [[ "${language}" == "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-ru.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-ru.html
     elif [ ! -f /etc/haproxy/auth.lua ] && [[ "${language}" != "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-en.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-en.html
     elif [ -f /etc/haproxy/auth.lua ] && [[ "${language}" == "1" ]]
     then
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-ru-hapr.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-ru-hapr.html
     else
-        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/sub-en-hapr.html
+        wget -O /var/www/${subspath}/sub.html https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/sub-en-hapr.html
     fi
 
     sed -i -e "s/DOMAIN/$domain/g" -e "s/SUBSCRIPTION-PATH/$subspath/g" /var/www/${subspath}/sub.html
 
-    wget -O /var/www/${subspath}/background.jpg https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Subscription-Page/background.jpg
+    wget -O /var/www/${subspath}/background.jpg https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Subscription-Page/background.jpg
 }
 
 update_scripts() {
@@ -232,12 +232,12 @@ update_scripts() {
         echo -e "${textcolor_light}Updating scripts...${clear}"
     fi
 
-    wget -O /usr/local/bin/rsupdate https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/ruleset-update.sh
+    wget -O /usr/local/bin/rsupdate https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/ruleset-update.sh
     chmod +x /usr/local/bin/rsupdate
 
     if [[ "${language}" == "1" ]]
     then
-        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/sb-manager-ru.sh
+        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/sb-manager-ru.sh
         chmod +x /usr/local/bin/sbmanager
         echo ""
         echo -e "${textcolor}Установка обновления v${new_version} завершена${clear}"
@@ -246,7 +246,7 @@ update_scripts() {
         echo "При проблемах с Sing-Box запустите команду:"
         echo "cp -f /etc/sing-box/config.json.0 /etc/sing-box/config.json && systemctl restart sing-box"
     else
-        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/sb-manager-en.sh
+        wget -O /usr/local/bin/sbmanager https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/sb-manager-en.sh
         chmod +x /usr/local/bin/sbmanager
         echo ""
         echo -e "${textcolor}The update v${new_version} has been installed${clear}"

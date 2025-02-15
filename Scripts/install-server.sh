@@ -1412,13 +1412,6 @@ cat > /etc/sing-box/config.json <<EOF
         "action": "hijack-dns"
       },
       {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "action": "reject",
-        "method": "drop"
-      },
-      {
         "protocol": "quic",
         "action": "reject",
         "method": "drop"
@@ -1549,7 +1542,7 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
       },
       {
         "tag": "dns-local",
-        "address": "tls://1.1.1.1"
+        "address": "udp://9.9.9.9"
       },
       {
         "tag": "dns-block",
@@ -1704,13 +1697,6 @@ cat > /var/www/${subspath}/1${userkey}-TRJ-CLIENT.json <<EOF
       {
         "ip_is_private": true,
         "outbound": "direct"
-      },
-      {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "action": "reject",
-        "method": "drop"
       },
       {
         "rule_set": [

@@ -1267,9 +1267,9 @@ update_ssb() {
     export -f get_pass
     export -f sync_client_configs_github
 
-    if [ $(wget -q -O /dev/null https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/update-server.sh; echo $?) -eq 0 ]
+    if [ $(wget -q -O /dev/null https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/update-server.sh; echo $?) -eq 0 ]
     then
-        bash <(curl -Ls https://raw.githubusercontent.com/BLUEBL0B/Secret-Sing-Box/master/Scripts/update-server.sh)
+        bash <(curl -Ls https://raw.githubusercontent.com/MeMadao/Secret-Sing-Box_PiHole/master/Scripts/update-server.sh)
         exit 0
     else
         echo -e "${red}Error: failed to load data from Github${clear}"
