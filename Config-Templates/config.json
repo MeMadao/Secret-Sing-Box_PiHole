@@ -91,13 +91,6 @@
         "action": "hijack-dns"
       },
       {
-        "rule_set": [
-          "category-ads-all"
-        ],
-        "action": "reject",
-        "method": "drop"
-      },
-      {
         "protocol": "quic",
         "action": "reject",
         "method": "drop"
