@@ -1,4 +1,4 @@
-[English version](https://github.com/MeMadao/Secret-Sing-Box_PiHole/blob/main/README-ENG.md)
+[English version](https://github.com/MeMadao/Secret-Sing-Box_PiHole/blob/main/Docs/README-EN.md)
 
 # Secret-Sing-Box + Pi-hole
 
