@@ -1,5 +1,8 @@
 [English version](https://github.com/MeMadao/Secret-Sing-Box_PiHole/blob/main/README-ENG.md)
 
+!!! In develop
+На данный момент, не работает с PiHole v6
+
 # Secret-Sing-Box + Pi-hole
 
 ### Добавляет Pi-hole для гибкой настройки блокирования рекламы и других нежелательных доменов при использовании [Sing-box](https://github.com/SagerNet/sing-box)
