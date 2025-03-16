@@ -1,8 +1,12 @@
 # Secret-Sing-Box + Pi-hole
 
+!!! In develop
+
+Currentle, doesn't work with PiHole v6
+
 ### Adds Pi-hole for flexible configuration of ad blocking and other unwanted domains when using [Sing-box](https://github.com/SagerNet/sing-box)
 
-Based on https://github.com/MeMadao/Secret-Sing-Box_PiHole
+Based on [https://github.com/MeMadao/Secret-Sing-Box_PiHole](https://github.com/BLUEBL0B/Secret-Sing-Box)
 
 Differences:
 * .by domains are excluded from proxying
