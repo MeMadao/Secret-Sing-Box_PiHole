@@ -1,7 +1,6 @@
 [English version](https://github.com/MeMadao/Secret-Sing-Box_PiHole/blob/main/Docs/README-EN.md)
 
-!!! In develop
-На данный момент, не работает с PiHole v6
+На данный момент, не работает с PiHole v6: PiHole v6 использует Lua вместо PHP, что затруднят конфигурирование Nginx (что в итоге явялется бесымселнным).
 
 # Secret-Sing-Box + Pi-hole
 
