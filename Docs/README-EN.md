@@ -1,8 +1,6 @@
 # Secret-Sing-Box + Pi-hole
 
-!!! In develop
-
-Currentle, doesn't work with PiHole v6
+Currentle, doesn't work with PiHole v6: PiHole v6 uses Lua instead of PHP, which makes configuring Nginx more difficult (which ultimately makes no sense).
 
 ### Adds Pi-hole for flexible configuration of ad blocking and other unwanted domains when using [Sing-box](https://github.com/SagerNet/sing-box)
 
